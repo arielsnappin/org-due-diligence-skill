@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Decision Cover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   SOFT EDITORIAL. Cream paper, ink text, pastels only as fills.
+   Serif carries the voice; sans carries the substance. Light by design:
+   it's a printed page, so it keeps its paper in dark mode too.
+   ===================================================================== */
+:root {
+  --paper: #F2EEDF; --paper-2: #ECE6D2; --card: rgba(255,255,255,.55); --card-solid: #FBF9F2;
+  --ink: #2A241B; --ink-soft: #5C5345; --ink-faint: #8A8171;
+  --pink: #E1A4C2; --lemon: #D6DD63; --blush: #E8C9B6; --sage: #B7C7A8; --lilac: #C9BEDC;
+  --rule: rgba(42,36,27,.18); --rule-2: rgba(42,36,27,.35);
+  --serif: "Cormorant Garamond", Garamond, Georgia, serif;
+  --sans: "Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gutter: clamp(16px, 5vw, 72px);
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+em { font-style: italic; }
+.serif { font-family: var(--serif); font-weight: 500; }
+.serif em { font-weight: 400; }
+
+/* ---------- Sheets: one idea per page ---------- */
+.sheet { max-width: 1240px; margin: 0 auto; padding: 56px var(--gutter) 72px; position: relative; }
+.sheet + .sheet { border-top: 1px dashed var(--rule-2); }
+.chrome { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 40px; }
+.chrome .eyebrow { font-size: 17px; }
+.chrome .num { font: italic 400 20px/1 var(--serif); color: var(--ink-soft); white-space: nowrap; }
+.swatches { display: flex; gap: 10px; }
+.swatches i { width: 30px; height: 30px; border-radius: 50%; display: block; }
+h1, h2, h3 { margin: 0; font-family: var(--serif); font-weight: 500; letter-spacing: -.015em; text-wrap: balance; }
+h2.title { font-size: clamp(44px, 6vw, 84px); line-height: .98; margin-bottom: 12px; }
+h3 { font-size: 30px; line-height: 1.1; margin-bottom: 14px; }
+.dek { font: italic 400 clamp(22px, 2.4vw, 30px)/1.25 var(--serif); color: var(--ink-soft); margin: 0 0 40px; max-width: 900px; }
+.kicker { font: 500 13px/1.2 var(--sans); letter-spacing: .01em; color: var(--ink-soft); margin: 0 0 10px; }
+.card { background: var(--card); border-radius: 24px; padding: 28px 30px; }
+.muted { color: var(--ink-soft); }
+.small { font-size: 14px; line-height: 1.5; }
+.grid-2 { display: grid; gap: 24px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .grid-2 { grid-template-columns: 1.25fr .75fr; gap: 48px; } }
+
+/* ---------- Pills ---------- */
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 6px; border-radius: 999px;
+  font: 500 12.5px/1 var(--sans); white-space: nowrap; background: var(--card-solid); }
+.pill.verified { background: var(--lemon); }
+.pill.reported { background: var(--blush); }
+.pill.inferred { background: var(--lilac); }
+.pill.unknown  { background: transparent; outline: 1.5px dashed var(--ink-soft); outline-offset: -1.5px; }
+.pill.ink { background: var(--ink); color: var(--paper); }
+.pill.fit { background: var(--card-solid); font-size: 14px; padding: 7px 14px 8px; }
+.src { font-size: 12.5px; color: var(--ink-soft); }
+
+/* ---------- Harvey balls: rating is shape + text, never color alone ---------- */
+.hb { width: 22px; height: 22px; flex: none; display: inline-block; vertical-align: middle; }
+.rating { display: inline-flex; align-items: center; gap: 8px; font: 500 14px/1 var(--sans); }
+
+/* ======================= 1. COVER ======================= */
+.cover-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: clamp(40px, 7vw, 88px); }
+.cover-top .eyebrow { font-size: 17px; }
+.cover h1 { font-size: clamp(60px, 11vw, 168px); line-height: .9; letter-spacing: -.025em; margin-bottom: 28px; }
+.cover .dek { max-width: 820px; }
+.short { display: grid; gap: 24px; grid-template-columns: 1fr; margin: 0 0 48px; }
+@media (min-width: 900px) { .short { grid-template-columns: 220px 1fr; } }
+.short .kicker { font: italic 400 26px/1.1 var(--serif); color: var(--ink); margin: 0; }
+.short p { margin: 0; font: 500 clamp(22px, 2.2vw, 28px)/1.3 var(--serif); max-width: 860px; }
+.options { display: grid; gap: 18px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .options { grid-template-columns: repeat(var(--n), 1fr); } }
+.opt { border-radius: 28px; padding: 26px 26px 24px; position: relative; display: flex; flex-direction: column; gap: 10px; }
+.opt .name { font: 500 40px/1 var(--serif); letter-spacing: -.01em; }
+.opt .role { font-size: 14.5px; line-height: 1.35; }
+.opt .status { font: italic 400 19px/1.2 var(--serif); color: var(--ink-soft); }
+.opt .note { font-size: 14.5px; line-height: 1.45; margin: 4px 0 0; }
+.opt .stars { margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--rule-2); display: grid; gap: 8px; }
+.opt .stars div { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13.5px; }
+.opt .lean { position: absolute; top: -12px; right: 20px; }
+.inside { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 8px 28px; font: italic 400 20px/1.3 var(--serif); color: var(--ink-soft); }
+.inside a { color: inherit; text-decoration: none; border-bottom: 1px dashed var(--rule-2); }
+.inside a:hover { color: var(--ink); }
+
+/* ======================= 2. AT A GLANCE ======================= */
+.matrix { display: grid; grid-template-columns: minmax(150px, 1.25fr) repeat(var(--n), minmax(0, 1fr)); align-items: stretch; }
+.matrix > div { padding: 12px 10px; border-top: 1px dashed var(--rule); display: flex; align-items: center; }
+.matrix .hd { border-top: 0; font: 500 24px/1.05 var(--serif); padding-bottom: 14px; align-items: flex-end; }
+.matrix .hd span { border-radius: 999px; padding: 5px 14px 7px; white-space: nowrap; font-size: 22px; }
+.matrix .sec { grid-column: 1 / -1; border-top: 0; padding: 18px 10px 4px; font: italic 400 19px/1 var(--serif); color: var(--ink-soft); }
+.matrix .dim { font-size: 14.5px; font-weight: 500; line-height: 1.25; }
+.matrix .cell { flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px; position: relative; cursor: default; }
+.matrix .cell .why { display: none; font-size: 12.5px; line-height: 1.4; color: var(--ink-soft); }
+.matrix.open .cell .why { display: block; }
+.matrix .overall { font-weight: 600; border-top: 1.5px solid var(--ink); }
+.matrix .cell.overall-cell { border-top: 1.5px solid var(--ink); }
+.star { color: var(--ink); margin-right: 4px; }
+.toggle { margin-top: 14px; border: 0; background: none; padding: 0; font: italic 400 19px/1 var(--serif); color: var(--ink-soft);
+  border-bottom: 1px dashed var(--rule-2); cursor: pointer; }
+.toggle:hover { color: var(--ink); }
+.tip { position: fixed; z-index: 50; max-width: 300px; background: var(--ink); color: var(--paper); border-radius: 14px;
+  padding: 10px 14px; font-size: 13px; line-height: 1.45; pointer-events: none; opacity: 0; transition: opacity .12s; }
+.tip.show { opacity: 1; }
+.matrix-wrap { overflow-x: auto; }
+.matrix-wrap .matrix { min-width: 620px; }
+.trade { font: 500 clamp(21px, 1.9vw, 25px)/1.3 var(--serif); margin: 0 0 32px; }
+.trade::before { content: "\201C"; display: block; font-size: 90px; line-height: .6; height: 34px; color: var(--ink-faint); }
+.flips { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: f; }
+.flips li { background: var(--card); border-radius: 20px; padding: 18px 20px 18px 62px; position: relative; counter-increment: f; }
+.flips li::before { content: counter(f); position: absolute; left: 18px; top: 14px; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--lemon); display: grid; place-items: center; font: 500 20px/1 var(--serif); }
+.flips b { display: block; font: 600 20px/1.2 var(--serif); margin-bottom: 4px; }
+.flips p { margin: 0 0 6px; font-size: 14.5px; }
+.flips .ask { font-size: 13px; color: var(--ink-soft); }
+
+/* ======================= 3. INSIDE THE ORG ======================= */
+.org { position: relative; background: var(--card); border-radius: 28px; padding: 32px 20px 28px; margin-bottom: 28px; }
+.org svg.edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.tier { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px 22px; position: relative; z-index: 1; }
+.tier + .tier { margin-top: 40px; }
+@media (max-width: 700px) { .org svg.edges { display: none; } .tier + .tier { margin-top: 16px; } }
+.node { background: var(--card-solid); border-radius: 18px; padding: 12px 16px 13px; min-width: 150px; max-width: 220px; text-align: center; }
+.node .n { font: 600 19px/1.1 var(--serif); }
+.node .r { font-size: 12.5px; line-height: 1.3; margin-top: 3px; }
+.node .m { font: italic 400 15px/1.2 var(--serif); color: var(--ink-soft); margin-top: 4px; }
+.node.you { background: var(--pink); outline: 2px solid var(--ink); outline-offset: 3px; }
+.node.lead { background: var(--lemon); }
+.node.peer { background: var(--sage); }
+.node.team { background: var(--blush); }
+.node.exit { background: transparent; outline: 1.5px dashed var(--ink-soft); outline-offset: -1.5px; }
+.node.gap  { background: transparent; outline: 1.5px dashed var(--ink-soft); outline-offset: -1.5px; }
+.node .flag { display: inline-block; margin-top: 7px; }
+.org-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; margin-top: 24px; font-size: 12.5px; color: var(--ink-soft); }
+.org-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.org-legend i { width: 14px; height: 14px; border-radius: 5px; display: inline-block; }
+.standouts { display: grid; gap: 14px; }
+.standout { border-top: 1px dashed var(--rule-2); padding-top: 14px; }
+.standout:first-child { border-top: 0; padding-top: 0; }
+.standout b { display: block; font: 600 21px/1.2 var(--serif); margin-bottom: 4px; }
+.standout p { margin: 0 0 8px; font-size: 14.5px; }
+.signals { display: grid; gap: 14px; grid-template-columns: 1fr; margin-top: 28px; }
+@media (min-width: 760px) { .signals { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); } }
+.signal { background: var(--card); border-radius: 20px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+.signal .who { font-size: 12.5px; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 8px; }
+.signal .what { font: 500 20px/1.25 var(--serif); }
+.bands { margin-top: 36px; }
+.band-row { display: grid; grid-template-columns: 116px 1fr; gap: 14px; align-items: center; padding: 10px 0; border-top: 1px dashed var(--rule); }
+.band-row .lbl { font-size: 14px; line-height: 1.25; }
+.band-row .lbl small { display: block; color: var(--ink-soft); font-size: 12px; }
+.track { position: relative; height: 34px; }
+.track .bar { position: absolute; top: 9px; height: 16px; border-radius: 4px; }
+.track .val { position: absolute; top: -2px; font-size: 11.5px; color: var(--ink-soft); white-space: nowrap; transform: translateY(-100%); }
+.track .offer { position: absolute; top: 4px; width: 3px; height: 26px; background: var(--ink); border-radius: 2px; }
+.track .offer span { position: absolute; left: 7px; top: 22px; font: italic 500 14px/1 var(--serif); white-space: nowrap; }
+.axis { display: grid; grid-template-columns: 116px 1fr; gap: 14px; }
+.axis .ticks { position: relative; height: 22px; border-top: 1px solid var(--rule-2); }
+.axis .ticks span { position: absolute; top: 5px; transform: translateX(-50%); font-size: 11.5px; color: var(--ink-soft); }
+.axis .ticks span:last-child { transform: translateX(-100%); }
+
+/* ======================= 4. NEXT CONVERSATION ======================= */
+.ask-card { background: var(--pink); border-radius: 32px; padding: clamp(28px, 4vw, 48px); margin-bottom: 24px; }
+.ask-card .q { font: 500 clamp(28px, 3.2vw, 40px)/1.12 var(--serif); margin: 8px 0 0; letter-spacing: -.01em; }
+.listen { display: grid; gap: 16px; grid-template-columns: 1fr; margin-bottom: 28px; }
+@media (min-width: 760px) { .listen { grid-template-columns: 1fr 1fr; } }
+.listen .card b { display: block; font: 600 20px/1.2 var(--serif); margin-bottom: 6px; }
+.listen .good { background: var(--sage); }
+.listen .bad  { background: transparent; outline: 1.5px dashed var(--ink-soft); outline-offset: -1.5px; }
+.walk { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.walk li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; font-size: 15px; }
+.walk li::before { content: "→"; font-family: var(--serif); font-size: 20px; line-height: 1.1; }
+.script { font: italic 400 21px/1.35 var(--serif); margin: 8px 0 0; }
+.timeline { position: relative; display: grid; gap: 18px; grid-template-columns: 1fr; margin-top: 12px; }
+@media (min-width: 900px) {
+  .timeline { grid-template-columns: repeat(var(--n), 1fr); gap: 14px; padding-top: 30px; }
+  .timeline::before { content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 2px; background: var(--rule-2); }
+  .step::before { top: -30px !important; left: 0 !important; }
+}
+.step { position: relative; padding-left: 38px; }
+@media (min-width: 900px) { .step { padding-left: 0; } }
+.step::before { content: ""; position: absolute; left: 0; top: 2px; width: 26px; height: 26px; border-radius: 50%; background: var(--lemon); outline: 4px solid var(--paper); }
+.step.key::before { background: var(--pink); }
+.step .when { font: 600 22px/1 var(--serif); margin-bottom: 6px; }
+.step p { margin: 0; font-size: 14px; line-height: 1.45; }
+
+/* ======================= 5. HOW THIS WAS MADE ======================= */
+.flow { position: relative; display: grid; gap: 22px; grid-template-columns: 1fr; }
+@media (min-width: 1000px) { .flow { grid-template-columns: 1.1fr 1fr 1fr; gap: 72px; align-items: center; } }
+.flow svg.edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; display: none; }
+@media (min-width: 1000px) { .flow svg.edges { display: block; } }
+.flow-head { display: none; font: italic 400 20px/1 var(--serif); color: var(--ink-soft); margin-bottom: 14px; }
+@media (min-width: 1000px) { .flow-head { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 72px; } }
+.col { display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
+.col > .kicker { font: italic 400 20px/1 var(--serif); color: var(--ink-soft); margin: 0 0 4px; }
+@media (max-width: 999px) { .col + .col::before { content: "↓"; font: 400 30px/1 var(--serif); color: var(--ink-faint); text-align: center; margin: -8px 0 4px; } }
+.fn { background: var(--card-solid); border-radius: 16px; padding: 11px 14px 12px; }
+.fn .t { font-weight: 500; font-size: 14.5px; line-height: 1.25; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.fn .t .c { font: 600 22px/1 var(--serif); }
+.fn .d { font-size: 12.5px; color: var(--ink-soft); line-height: 1.35; margin-top: 3px; }
+.fn.group { padding: 16px 18px 12px; }
+.fn.group .gt { font: 600 22px/1 var(--serif); margin-bottom: 8px; }
+.fn.group .row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 8px 0; border-top: 1px dashed var(--rule-2); }
+.fn.group .row .t, .fn.group .row .d { grid-column: 1; }
+.fn.group .row .c { grid-column: 2; grid-row: 1 / span 2; font: 600 26px/1 var(--serif); align-self: center; }
+.fn.input { background: var(--blush); }
+.fn.output { background: var(--card-solid); border: 1.5px solid var(--ink); }
+.hat { border-radius: 22px; padding: 16px 18px 17px; }
+.hat .hn { font: 600 26px/1 var(--serif); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.hat .hn small { font: 500 11.5px/1 var(--sans); color: var(--ink-soft); }
+.hat .hd { font-size: 13.5px; line-height: 1.4; margin-top: 6px; }
+.hat.researcher { background: var(--sage); }
+.hat.strategist { background: var(--lilac); }
+.hat.coach { background: var(--pink); }
+.hat.check { background: var(--lemon); border-radius: 999px; padding: 11px 18px; }
+.hat.check .hn { font-size: 20px; }
+.hat.off { background: transparent; outline: 1.5px dashed var(--ink-soft); outline-offset: -1.5px; color: var(--ink-soft); }
+.evals { margin-top: 48px; background: var(--card); border-radius: 28px; padding: clamp(22px, 3vw, 36px); }
+.evals-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; margin-bottom: 20px; }
+.evals-head h3 { margin: 0; }
+.ledger { display: flex; height: 44px; border-radius: 12px; overflow: hidden; gap: 2px; margin: 0 0 22px; }
+.ledger div { display: grid; place-items: center; font: 600 18px/1 var(--serif); min-width: 32px; }
+.eval-cols { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .eval-cols { grid-template-columns: repeat(4, 1fr); } }
+.eval-col { border-top: 1px dashed var(--rule-2); padding-top: 14px; }
+.eval-col .n { font: 600 40px/1 var(--serif); margin: 10px 0 6px; }
+.eval-col p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.45; }
+.eval-col .ex { font: italic 400 17px/1.3 var(--serif); color: var(--ink); }
+.checks { font: italic 400 19px/1.3 var(--serif); color: var(--ink-soft); }
+
+footer.foot { max-width: 1240px; margin: 0 auto; padding: 24px var(--gutter) 48px; display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: 8px 24px; font: italic 400 17px/1.35 var(--serif); color: var(--ink-soft); border-top: 1px dashed var(--rule-2); }
+
+@media print {
+  .sheet { break-after: page; max-width: none; }
+  .toggle { display: none; }
+  .matrix .cell .why { display: block; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rise { animation: rise .8s cubic-bezier(.22,1,.36,1) var(--d, 0s) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<footer class="foot" id="foot"></footer>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+/* =====================================================================
+   EDIT ONLY THIS OBJECT. The pages render from it; never touch the layout.
+   Fill it from THIS run's files: the brief, each dossier, the call sheet,
+   and the run log (what was read, how each claim is labeled).
+   eyebrow: for a real run, "Decision brief · v2 · Oct 3, 2026".
+   Markup: *text* in any title renders in italic.
+   Ratings: "high" | "medium" | "low" | "unknown"
+   Overall: "high" | "medium" | "low" | "miss" | "early"
+   Gates:   "pass" | "fail" | "unknown"
+   Labels:  "verified" | "reported" | "inferred" | "unknown"
+   The sample below is fictional.
+   ===================================================================== */
+const COVER = {
+  eyebrow: "Illustrative copy · every company, person, and number is fictional",
+  version: 1,
+  headline: "A founder *or* a ladder?",
+  question: "Which option puts you in a Head of Product seat within two years, with a team you'd be proud to lead?",
+  bottomLine: "Leaning Company A, with conditions. It's the only path to the top product seat within two years, but only if the founder hands over product. You can find out before Thursday's call ends.",
+  whatChanged: [],
+  lean: 0,
+  options: [
+    { name: "Company A", role: "Director of Product · first product leader, exec seat", status: "Offer in hand",
+      overall: "high", note: "Fastest route to the seat you want, if the founder truly lets go." },
+    { name: "Company B", role: "Group PM · core platform, 30 engineers", status: "Offer in hand",
+      overall: "medium", note: "Great job, wrong ladder: Director seats go to outside hires." },
+    { name: "Stay", role: "Senior PM · same scope, strong manager", status: "Your current job", stay: true,
+      overall: "low", note: "Safe and supported, but a shrinking org won't create the seat." }
+  ],
+  gates: [ { name: "Hybrid, 3 office days max", values: ["unknown", "pass", "pass"] } ],
+  dimensions: [
+    { name: "Path to next level", star: true, ratings: [
+      { level: "high", note: "Top product seat now; 'grows into Head of' is the recruiter's phrase only [Reported]" },
+      { level: "low", note: "Last two Director seats hired externally [Reported · LinkedIn]" },
+      { level: "medium", note: "March cycle, but no Director seat open" } ] },
+    { name: "Scope & team", star: true, ratings: [
+      { level: "medium", note: "4 PMs, one likely internal candidate [Inferred]" },
+      { level: "high", note: "Core platform, 30 engineers [Verified · hiring manager]" },
+      { level: "medium", note: "Same scope, nothing new planned" } ] },
+    { name: "Manager & reporting line", ratings: [
+      { level: "medium", note: "The founder; no product leader to learn from" },
+      { level: "high", note: "VP in seat 3 yrs, promoted two PMs this year [Reported · LinkedIn]" },
+      { level: "high", note: "Strong advocate" } ] },
+    { name: "Leadership & exec access", ratings: [
+      { level: "high", note: "Exec-team seat [Verified · offer letter]" },
+      { level: "medium", note: "Product reports through the CTO" },
+      { level: "medium", note: "Two layers from the execs" } ] },
+    { name: "Org health & momentum", ratings: [
+      { level: "medium", note: "Series B 14 months ago; product team 6 → 11" },
+      { level: "high", note: "Hiring up; profitable per the CFO [Reported · press]" },
+      { level: "low", note: "Product down ~10%; two leaders left" } ] },
+    { name: "Economics", ratings: [
+      { level: "medium", note: "Mid-band base; large, illiquid equity" },
+      { level: "high", note: "Top of band; tenders in 2024 and 2025" },
+      { level: "medium", note: "Refresh in March" } ] },
+    { name: "Ways of working", ratings: [
+      { level: "unknown", note: "Office policy not stated. Ask the recruiter." },
+      { level: "medium", note: "3 office days; intense pace" },
+      { level: "high", note: "Known rhythms" } ] }
+  ],
+  trade: "Would you rather bet on a founder or on a ladder? A founder bet pays off fast or fails fast, and you can test it this week. A ladder bet is slower and safer, but Company B's ladder has a gap at exactly the rung you need.",
+  unknowns: [
+    { question: "Will the founder hand over product decisions?", flips: "Yes → A is the clear pick. A hedge → A drops on path and scope, and B leads.", ask: "The founder, Thursday · the previous Head of Product, Monday" },
+    { question: "Company A's office policy (a must-have)", flips: "More than 3 office days and A is out.", ask: "The recruiter, by email, this week" },
+    { question: "Does Company B have an internal Director path?", flips: "A named path with a date closes most of the gap with A.", ask: "B's VP, before you answer the offer" }
+  ],
+
+  /* Page 3: highlights from the dossier of the option that matters most right now */
+  org: {
+    company: "Company A",
+    headline: "The job is real *if* the founder lets go",
+    dek: "You'd be the first product leader between the founder and the PMs. The last person in the seat lasted 11 months.",
+    tiers: [
+      [ { name: "Founder-CEO", role: "Runs weekly product reviews", meta: "5 yrs", kind: "lead", label: "reported" } ],
+      [ { name: "You", role: "Director of Product · exec-team seat", meta: "the offer", kind: "you", label: "verified" },
+        { name: "VP Engineering", role: "From the founder's last company", meta: "4 yrs", kind: "peer" },
+        { name: "Previous Head of Product", role: "Left for a Director role elsewhere", meta: "11 months · left Nov 2025", kind: "exit", label: "reported" } ],
+      [ { name: "Senior PM", role: "Acting product lead since last fall", meta: "likely internal candidate", kind: "team", label: "inferred" },
+        { name: "3 PMs", role: "Your team", kind: "team" },
+        { name: "5 designers", role: "Reporting line not stated", kind: "gap", label: "unknown" } ]
+    ],
+    edges: [[0,0,1,0],[0,0,1,1],[0,0,1,2],[1,0,2,0],[1,0,2,1],[1,0,2,2]],
+    standouts: [
+      { title: "The seat has turned over once, sideways", text: "A lateral move after 11 months usually means the job wasn't what was promised. Ask someone other than the founder.", label: "inferred", source: "dates and titles" },
+      { title: "The founder still reads every spec", text: "Said publicly in 2025. With the short tenure above, it's the single most important thing to test.", label: "reported", source: "podcast, 2025" },
+      { title: "The engineering bench is the founder's old team", text: "Fast alignment and high trust, and a harder road for an outsider walking into a tight group.", label: "reported", source: "LinkedIn" }
+    ],
+    signals: [
+      { who: "Founder-CEO", when: "Podcast, 2025", what: "Still reads every product spec personally", label: "reported" },
+      { who: "Company A careers page", when: "Sep 2026", what: "Four product roles say “NYC-based” with no office policy", label: "verified" },
+      { who: "Company B's VP of Product", when: "LinkedIn post, 2026", what: "Celebrated two promotions to Group PM, none to Director", label: "reported" }
+    ],
+    bands: {
+      title: "Base pay won't decide this",
+      unit: "K",
+      min: 200, max: 320, ticks: [200, 240, 280, 320],
+      rows: [
+        { option: 0, level: "Director of Product", lo: 240, hi: 280, offer: 260, offerLabel: "your offer" },
+        { option: 1, level: "Director of Product", lo: 255, hi: 300 },
+        { option: 1, level: "Group PM", lo: 225, hi: 260, offer: 260, offerLabel: "your offer" }
+      ],
+      note: "Posted base bands, NYC, Aug–Sep 2026 [Verified · postings]. Equity is the real difference: B has had two tenders in two years; A's grant is larger on paper and can't be valued from outside."
+    }
+  },
+
+  /* Page 4: highlights from the call sheet for the next conversation */
+  call: {
+    who: "The founder", with: "Company A", when: "Thursday",
+    why: "This conversation decides it.",
+    walkAway: [
+      "Which product decisions they'll hand over, and when",
+      "What happened with the previous Head of Product",
+      "The office policy, if the recruiter hasn't answered"
+    ],
+    question: "Which product decisions did you make last month that you'd want me to make three months from now?",
+    good: "Names specific decisions and how the handover would work.",
+    evasive: "“We'll figure it out together.”",
+    followUp: "What happened with the previous Head of Product, and what would you do differently? Listen for ownership, not blame.",
+    tricky: { moment: "“Where else are you talking?”", script: "I have an offer in hand and I'm taking the decision seriously. This is the conversation that matters most to me." }
+  },
+  plan: [
+    { when: "Mon", what: "Email Company A's recruiter about office policy; ask to meet one PM." },
+    { when: "Tue", what: "Ask for an intro to the previous Head of Product; message two former A PMs." },
+    { when: "Thu", what: "The founder call. Ask the handover question first.", key: true },
+    { when: "Fri", what: "Ask B's VP the Director-path question; ask for time if needed." },
+    { when: "Next Mon", what: "Debrief everything here, then decide." }
+  ],
+
+  /* Page 5: the run log. Record what actually happened on THIS run. */
+  run: {
+    minutes: 40,
+    gave: [
+      { title: "Your goal", detail: "Head of Product within two years" },
+      { title: "★ Priorities", detail: "Path to the next level · scope & team" },
+      { title: "Must-have", detail: "Hybrid, 3 office days max" },
+      { title: "Your files", detail: "Recruiter notes · 2 offer letters" }
+    ],
+    sources: [
+      { title: "LinkedIn", via: "Claude in Chrome, read-only", count: 41, unit: "profiles", detail: "2 company pages · function-filtered headcount" },
+      { title: "Job postings", count: 7, unit: "with pay bands", detail: "Live and recently removed" },
+      { title: "Company sites", count: 3, unit: "pages", detail: "Careers · About · leadership" },
+      { title: "Press & interviews", count: 6, unit: "pieces", detail: "Series B · tenders · CFO interview · CEO podcast" }
+    ],
+    hats: {
+      researcher: { ran: true, did: "Read 2 orgs: leaders, ladder, bands, momentum, exits. Found 3 people you know who've been inside." },
+      check: { ran: true, did: "10 data-trap checks on every number and rating" },
+      strategist: { ran: true, did: "3 options × 7 dimensions, 1 must-have, 3 decision-critical unknowns" },
+      coach: { ran: true, did: "1 Call Sheet for the founder call" }
+    },
+    outputs: [
+      { title: "Org Dossiers", detail: "Company A · Company B", hat: "researcher", file: "dossier-company-a.md" },
+      { title: "Backchannel List", detail: "3 people · drafts you send", hat: "researcher", file: "backchannel-company-a.md" },
+      { title: "Decision Brief", detail: "The full reasoning", hat: "strategist", file: "decision-brief.md" },
+      { title: "Call Sheet", detail: "The founder · Thursday", hat: "coach", file: "call-sheet-founder-thu.md" }
+    ],
+    evals: {
+      checks: 10,
+      verified: { n: 6, example: "Exec-team seat, in the offer letter" },
+      reported: { n: 14, example: "The founder still reads every spec, from a 2025 podcast" },
+      inferred: { n: 4, example: "The Senior PM is likely an internal candidate" },
+      unknown: { n: 3, example: "Company A's office policy. It became a question." }
+    }
+  }
+};
+
+/* ===================== Rendering: no need to edit ===================== */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const md = s => esc(s).replace(/\*(.+?)\*/g, "<em>$1</em>");
+const C = COVER, N = C.options.length;
+const OPT_FILL = ["var(--pink)", "var(--sage)", "var(--lilac)", "var(--lemon)"];
+const fill = i => C.options[i].stay ? "var(--paper-2)" : OPT_FILL[C.options.filter((o, j) => j < i && !o.stay).length % OPT_FILL.length];
+const LEVEL = { high: "High", medium: "Medium", low: "Low", unknown: "?" };
+const OVERALL = { high: "High fit", medium: "Medium fit", low: "Low fit", miss: "Misses a must-have", early: "Too early to call" };
+const GATE = { pass: ["high", "Clears"], fail: ["low", "Fails"], unknown: ["unknown", "Unknown"] };
+const LABEL = { verified: "Verified", reported: "Reported", inferred: "Inferred", unknown: "? Unknown" };
+const pill = (k, extra = "") => k ? `<span class="pill ${k}">${LABEL[k]}${extra ? ` · ${esc(extra)}` : ""}</span>` : "";
+
+/* Harvey ball: full = High, half = Medium, quarter = Low, dashed = unknown */
+function hb(level) {
+  const r = 10, c = 11;
+  const ring = `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--ink)" stroke-width="1.5"${level === "unknown" ? ' stroke-dasharray="3 3"' : ""}/>`;
+  const wedge = f => `<path d="M${c} ${c} L${c} ${c - r} A${r} ${r} 0 ${f > .5 ? 1 : 0} 1 ${c + r * Math.sin(2 * Math.PI * f)} ${c - r * Math.cos(2 * Math.PI * f)} Z" fill="var(--ink)"/>`;
+  const inner = level === "high" ? `<circle cx="${c}" cy="${c}" r="${r}" fill="var(--ink)"/>` : level === "medium" ? wedge(.5) : level === "low" ? wedge(.25) : "";
+  return `<svg class="hb" viewBox="0 0 22 22" aria-hidden="true">${inner}${ring}</svg>`;
+}
+const rating = l => `<span class="rating">${hb(l)}${LEVEL[l] || "?"}</span>`;
+const sheet = (id, n, eyebrow, body) => `<section class="sheet" id="${id}"><div class="chrome"><span class="eyebrow">${eyebrow}</span><span class="num">${n}</span></div>${body}</section>`;
+
+const pages = [];
+const TOTAL = 5;
+const leanOpt = C.options[C.lean];
+
+/* ---------- 1. Cover ---------- */
+const starDims = C.dimensions.filter(d => d.star);
+pages.push(`<section class="sheet cover" id="cover">
+  <div class="cover-top"><span class="eyebrow">${esc(C.eyebrow)}</span>
+    <div class="swatches" aria-hidden="true"><i style="background:var(--pink)"></i><i style="background:var(--lemon)"></i><i style="background:var(--sage)"></i></div></div>
+  <h1 class="serif rise">${md(C.headline)}</h1>
+  <p class="dek rise" style="--d:.1s">${esc(C.question)}</p>
+  ${C.whatChanged && C.whatChanged.length ? `<div class="card small" style="margin-bottom:32px"><b>What changed since v${C.version - 1}</b><ul>${C.whatChanged.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>` : ""}
+  <div class="short rise" style="--d:.2s"><p class="kicker">The short version</p><p>${esc(C.bottomLine)}</p></div>
+  <div class="options" style="--n:${N}">${C.options.map((o, i) => `
+    <article class="opt rise" style="background:${fill(i)};--d:${.3 + i * .08}s">
+      ${i === C.lean ? '<span class="pill ink lean">My lean</span>' : ""}
+      <div class="name">${esc(o.name)}</div>
+      <div class="status">${esc(o.status || "")}</div>
+      <div class="role">${esc(o.role)}</div>
+      <div><span class="pill fit">${OVERALL[o.overall] || "?"}</span></div>
+      <p class="note">${esc(o.note)}</p>
+      <div class="stars">${starDims.map(d => `<div><span>★ ${esc(d.name)}</span>${rating(d.ratings[i].level)}</div>`).join("")}</div>
+    </article>`).join("")}</div>
+  <nav class="inside" aria-label="Inside"><span>Inside:</span><a href="#glance">At a glance</a><a href="#org">Inside ${esc(C.org.company)}</a><a href="#call">Your next conversation</a><a href="#made">How this was made</a></nav>
+</section>`);
+
+/* ---------- 2. At a glance ---------- */
+let m = `<div class="hd"></div>${C.options.map((o, i) => `<div class="hd"><span style="background:${fill(i)}">${esc(o.name)}</span></div>`).join("")}`;
+if (C.gates && C.gates.length) {
+  m += `<div class="sec">Must-haves</div>`;
+  C.gates.forEach(g => { m += `<div class="dim">${esc(g.name)}</div>` + g.values.map(v => `<div class="cell"><span class="pill ${v === "pass" ? "verified" : v === "fail" ? "reported" : "unknown"}">${{ pass: "✓", fail: "✗", unknown: "?" }[v]} ${GATE[v][1]}</span></div>`).join(""); });
+}
+m += `<div class="sec">Against your goals <span class="star">★</span>= matters most to you</div>`;
+[...C.dimensions].sort((a, b) => (!!b.star) - (!!a.star)).forEach(d => {
+  m += `<div class="dim">${d.star ? '<span class="star">★</span>' : ""}${esc(d.name)}</div>` +
+    d.ratings.map(r => `<div class="cell" tabindex="0" data-tip="${esc(r.note)}">${rating(r.level)}<span class="why">${esc(r.note)}</span></div>`).join("");
+});
+m += `<div class="dim overall">Overall fit</div>` + C.options.map(o => `<div class="cell overall-cell"><span class="pill fit">${OVERALL[o.overall]}</span></div>`).join("");
+pages.push(sheet("glance", `2 / ${TOTAL}`, "At a glance", `
+  <h2 class="title">Nobody wins <em>everything</em></h2>
+  <p class="dek">Every rating means good for <em>your</em> goals, not good in the abstract.</p>
+  <div class="grid-2">
+    <div><div class="matrix-wrap"><div class="matrix" id="matrix" style="--n:${N}" role="table" aria-label="Options against your goals">${m}</div></div>
+      <button class="toggle" id="why">Show the reasons</button></div>
+    <div><p class="kicker">The trade</p><p class="trade">${esc(C.trade)}</p>
+      <p class="kicker">What could change the answer</p>
+      <ol class="flips">${C.unknowns.map(u => `<li><b>${esc(u.question)}</b><p>${esc(u.flips)}</p><div class="ask">Ask: ${esc(u.ask)}</div></li>`).join("")}</ol></div>
+  </div>`));
+
+/* ---------- 3. Inside the org ---------- */
+const o = C.org, bnd = o.bands;
+const x = v => ((v - bnd.min) / (bnd.max - bnd.min) * 100).toFixed(2) + "%";
+pages.push(sheet("org", `3 / ${TOTAL}`, `Inside ${esc(o.company)} · from the dossier`, `
+  <h2 class="title">${md(o.headline)}</h2>
+  <p class="dek">${esc(o.dek)}</p>
+  <div class="org" id="orgchart"><svg class="edges" aria-hidden="true"></svg>
+    ${o.tiers.map((t, ti) => `<div class="tier">${t.map((n, ni) => `<div class="node ${n.kind || ""}" data-node="${ti}-${ni}">
+      <div class="n">${esc(n.name)}</div><div class="r">${esc(n.role || "")}</div>${n.meta ? `<div class="m">${esc(n.meta)}</div>` : ""}
+      ${n.label ? `<div class="flag">${pill(n.label)}</div>` : ""}</div>`).join("")}</div>`).join("")}
+    <div class="org-legend"><span><i style="background:var(--pink);outline:1.5px solid var(--ink)"></i>Your seat</span><span><i style="background:var(--lemon)"></i>Your manager</span><span><i style="background:var(--sage)"></i>Peer</span><span><i style="background:var(--blush)"></i>Your team</span><span><i style="outline:1.5px dashed var(--ink-soft)"></i>Left, or not yet known</span></div>
+  </div>
+  <div class="grid-2">
+    <div><p class="kicker">What stands out</p><div class="standouts">${o.standouts.map(s => `<div class="standout"><b>${esc(s.title)}</b><p>${esc(s.text)}</p>${pill(s.label, s.source)}</div>`).join("")}</div></div>
+    <div class="bands" style="margin-top:0"><p class="kicker">Levels and money</p><h3>${md(bnd.title)}</h3>
+      ${bnd.rows.map(r => `<div class="band-row"><div class="lbl">${esc(C.options[r.option].name)}<small>${esc(r.level)}</small></div>
+        <div class="track" data-tip="${esc(`${C.options[r.option].name}, ${r.level}: $${r.lo}–${r.hi}${bnd.unit}${r.offer ? `; your offer $${r.offer}${bnd.unit}` : ""}`)}" tabindex="0">
+          <div class="bar" style="left:${x(r.lo)};width:calc(${x(r.hi)} - ${x(r.lo)});background:${fill(r.option)}"></div>
+          ${r.offer ? `<div class="offer" style="left:${x(r.offer)}"><span>${esc(r.offerLabel || "offer")}</span></div>` : ""}</div></div>`).join("")}
+      <div class="axis"><div></div><div class="ticks">${bnd.ticks.map(t => `<span style="left:${x(t)}">$${t}${bnd.unit}</span>`).join("")}</div></div>
+      <p class="src" style="margin-top:14px">${esc(bnd.note)}</p></div>
+  </div>
+  <p class="kicker" style="margin-top:40px">What they've said and posted lately</p>
+  <div class="signals">${o.signals.map(s => `<div class="signal"><div class="who"><span>${esc(s.who)}</span><span>${esc(s.when)}</span></div><div class="what">${esc(s.what)}</div><div>${pill(s.label)}</div></div>`).join("")}</div>`));
+
+/* ---------- 4. Next conversation ---------- */
+const c = C.call;
+pages.push(sheet("call", `4 / ${TOTAL}`, `Your next conversation · from the Call Sheet`, `
+  <h2 class="title">${esc(c.who)}, <em>${esc(c.when)}</em></h2>
+  <p class="dek">${esc(c.with)}. ${esc(c.why)}</p>
+  <div class="grid-2">
+    <div>
+      <div class="ask-card"><p class="kicker">Ask this first</p><p class="q">“${esc(c.question)}”</p></div>
+      <div class="listen"><div class="card good"><b>A real answer</b>${esc(c.good)}</div><div class="card bad"><b>A non-answer</b>${esc(c.evasive)}</div></div>
+      ${c.followUp ? `<p class="kicker">Then</p><p style="margin:0 0 8px;font-size:15px">${esc(c.followUp)}</p>` : ""}
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:20px"><p class="kicker">Walk away knowing</p><ul class="walk">${c.walkAway.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>
+      ${c.tricky ? `<div class="card"><p class="kicker">If they ask ${esc(c.tricky.moment)}</p><p class="script">${esc(c.tricky.script)}</p></div>` : ""}
+    </div>
+  </div>
+  <p class="kicker" style="margin-top:44px">The next two weeks</p>
+  <div class="timeline" style="--n:${C.plan.length}">${C.plan.map(p => `<div class="step${p.key ? " key" : ""}"><div class="when">${esc(p.when)}</div><p>${esc(p.what)}</p></div>`).join("")}</div>`));
+
+/* ---------- 5. How this was made ---------- */
+const R = C.run, H = R.hats;
+const hatBox = (k, name, sub) => { const h = H[k] || {}; return `<div class="hat ${k}${h.ran ? "" : " off"}" data-f="${k}"><div class="hn">${name}<small>${sub}</small></div><div class="hd">${esc(h.ran ? h.did : (h.did || "Not run this time"))}</div></div>`; };
+const E = R.evals, EV = ["verified", "reported", "inferred", "unknown"].filter(k => E[k] && E[k].n);
+const lt = EV.reduce((t, k) => t + E[k].n, 0);
+const LEDGER = { verified: "background:var(--lemon)", reported: "background:var(--blush)", inferred: "background:var(--lilac)", unknown: "outline:1.5px dashed var(--ink-soft);outline-offset:-1.5px" };
+const MEANS = { verified: "A primary source: an offer letter, a posting, a filing.", reported: "One secondary source: a profile, an article, what a recruiter said.", inferred: "A pattern read from the evidence, with the reasoning shown.", unknown: "A gap. It stays a question instead of becoming a guess." };
+pages.push(sheet("made", `5 / ${TOTAL} · appendix`, "How this was made", `
+  <h2 class="title">One advisor, <em>three hats</em></h2>
+  <p class="dek">What ran on this decision, what it read, and how sure it is of each claim. About ${R.minutes} minutes, read-only throughout.</p>
+  <div class="flow-head" aria-hidden="true"><span>What went in</span><span>Three hats</span><span>What you got</span></div>
+  <div class="flow" id="flow"><svg class="edges" aria-hidden="true"></svg>
+    <div class="col">
+      <div class="fn group input" data-f="gave"><div class="gt">You gave</div>${R.gave.map(g => `<div class="row"><div class="t">${esc(g.title)}</div><div class="d">${esc(g.detail)}</div></div>`).join("")}</div>
+      <div class="fn group" data-f="read"><div class="gt">It read</div>${R.sources.length ? R.sources.map(s => `<div class="row"><div class="t">${esc(s.title)}</div>${s.count != null ? `<span class="c">${s.count}</span>` : ""}<div class="d">${s.unit ? esc(s.unit) + (s.detail ? " · " : "") : ""}${esc(s.detail || "")}${s.via ? ` · <em>via ${esc(s.via)}</em>` : ""}</div></div>`).join("") : `<div class="row"><div class="t">Your notes only</div><div class="d">No browser or web search this run</div></div>`}</div>
+    </div>
+    <div class="col">${hatBox("researcher", "Researcher", "reads the org")}${hatBox("check", "Fact-check", "independent")}${hatBox("strategist", "Strategist", "weighs the options")}${hatBox("coach", "Coach", "preps the call")}</div>
+    <div class="col">${R.outputs.map((f, i) => `<div class="fn output" data-f="out${i}"><div class="t">${esc(f.title)}</div><div class="d">${esc(f.detail)}</div></div>`).join("")}
+      <div class="fn output" data-f="outc" style="background:var(--ink);color:var(--paper)"><div class="t">This cover</div><div class="d" style="color:var(--paper-2)">You're reading it</div></div></div>
+  </div>
+  <div class="evals">
+    <div class="evals-head"><div><p class="kicker">Evals</p><h3>How sure is each claim?</h3></div>
+      <span class="checks">${lt} claims labeled · ${E.checks} data-trap checks by an independent fact-checker</span></div>
+    <div class="ledger" role="img" aria-label="${EV.map(k => `${E[k].n} ${k}`).join(", ")}">${EV.map(k => `<div style="flex:${E[k].n};${LEDGER[k]}" title="${LABEL[k]}: ${E[k].n}">${E[k].n}</div>`).join("")}</div>
+    <div class="eval-cols">${EV.map(k => `<div class="eval-col">${pill(k)}<div class="n">${E[k].n}</div><p>${MEANS[k]}</p>${E[k].example ? `<p class="ex">“${esc(E[k].example)}”</p>` : ""}</div>`).join("")}</div>
+  </div>`));
+
+document.getElementById("app").innerHTML = pages.join("");
+document.getElementById("foot").innerHTML = `<span>Ratings are relative to your goals · fact-checked against 10 known data traps</span><span>The full reasoning lives in the memos. This cover summarizes them and never replaces them.</span>`;
+
+/* ---------- Interactions: reasons toggle and tooltips ---------- */
+document.getElementById("why").addEventListener("click", e => {
+  const open = document.getElementById("matrix").classList.toggle("open");
+  e.target.textContent = open ? "Hide the reasons" : "Show the reasons";
+});
+const tip = document.getElementById("tip");
+const showTip = el => { const r = el.getBoundingClientRect(); tip.textContent = el.dataset.tip; tip.classList.add("show");
+  const w = tip.offsetWidth; tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
+  tip.style.top = (r.top - tip.offsetHeight - 8 < 8 ? r.bottom + 8 : r.top - tip.offsetHeight - 8) + "px"; };
+document.querySelectorAll("[data-tip]").forEach(el => {
+  el.addEventListener("mouseenter", () => { if (!document.getElementById("matrix").classList.contains("open") || !el.classList.contains("cell")) showTip(el); });
+  el.addEventListener("focus", () => showTip(el));
+  ["mouseleave", "blur"].forEach(ev => el.addEventListener(ev, () => tip.classList.remove("show")));
+});
+addEventListener("scroll", () => tip.classList.remove("show"), { passive: true });
+
+/* ---------- Connectors: measured from the laid-out boxes, redrawn on resize ---------- */
+function connect(host, pairs, opts = {}) {
+  const svg = host.querySelector("svg.edges"); if (!svg || getComputedStyle(svg).display === "none") return;
+  const hb = host.getBoundingClientRect();
+  let d = "";
+  pairs.forEach(([a, b, style]) => {
+    const A = a.getBoundingClientRect(), B = b.getBoundingClientRect();
+    let p;
+    if (opts.vertical || Math.abs((A.left + A.width / 2) - (B.left + B.width / 2)) < 40) {
+      const x1 = A.left + A.width / 2 - hb.left, y1 = A.bottom - hb.top, x2 = B.left + B.width / 2 - hb.left, y2 = B.top - hb.top, ym = (y1 + y2) / 2;
+      p = opts.vertical ? `M${x1} ${y1} V${ym} H${x2} V${y2}` : `M${x1} ${y1} V${y2}`;
+    } else {
+      const x1 = A.right - hb.left, y1 = A.top + A.height / 2 - hb.top, x2 = B.left - hb.left, y2 = B.top + B.height / 2 - hb.top, k = (x2 - x1) * .5;
+      p = `M${x1} ${y1} C${x1 + k} ${y1} ${x2 - k} ${y2} ${x2} ${y2}`;
+    }
+    d += `<path d="${p}" fill="none" stroke="var(--ink-soft)" stroke-width="1.5"${style === "dash" ? ' stroke-dasharray="4 5"' : ""} opacity=".7"/>`;
+  });
+  svg.innerHTML = d;
+}
+function drawAll() {
+  const org = document.getElementById("orgchart"), q = s => org.querySelector(`[data-node="${s}"]`);
+  connect(org, (o.edges || []).map(([t1, n1, t2, n2]) => {
+    const child = o.tiers[t2][n2];
+    return [q(`${t1}-${n1}`), q(`${t2}-${n2}`), child.kind === "exit" || child.kind === "gap" ? "dash" : ""];
+  }).filter(p => p[0] && p[1]), { vertical: true });
+  const flow = document.getElementById("flow"); if (getComputedStyle(flow.querySelector("svg.edges")).display === "none") return;
+  const f = k => flow.querySelector(`[data-f="${k}"]`), on = k => H[k] && H[k].ran;
+  const pairs = [];
+  pairs.push([f("gave"), f("researcher")], [f("gave"), f("strategist")], [f("read"), f("researcher")]);
+  pairs.push([f("researcher"), f("check")], [f("check"), f("strategist")], [f("strategist"), f("coach"), on("coach") ? "" : "dash"]);
+  R.outputs.forEach((out, i) => pairs.push([f(out.hat === "researcher" ? "check" : out.hat), f(`out${i}`)]));
+  pairs.push([f("coach"), f("outc")]);
+  connect(flow, pairs.filter(p => p[0] && p[1]));
+}
+const redraw = () => requestAnimationFrame(drawAll);
+Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))]).then(() => { drawAll(); setTimeout(drawAll, 900); });
+addEventListener("resize", redraw);
+</script>
+</body>
+</html>

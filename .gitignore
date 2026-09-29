@@ -1,0 +1,10 @@
+# Personal material and real runs: never commit
+private/
+runs/
+*-workspace/
+
+# Local tool settings
+.claude/settings.local.json
+
+.DS_Store
+.venv/

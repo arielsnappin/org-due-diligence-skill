@@ -1,0 +1,81 @@
+{
+  "skill_name": "org-due-diligence",
+  "note": "Fictional test scenarios only. Research quality on real companies is tested separately in private runs whose outputs are never committed.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "eval-1-broad-offer-intake",
+      "prompt": "I just got an offer to be Director of Product at a Series C healthtech startup called Veridia Health (about 400 people). I'm a Senior PM at a fintech right now. Honestly no idea if I should take it. Can you help me think it through?",
+      "expected_output": "One short intake message: at most 6 questions, explicitly skippable, about 3 minutes. Skips anything already answered (company, role, current job). Includes a plain-language Claude in Chrome / LinkedIn setup note (or a note on browser access) and the profile-view heads-up. Does NOT launch research before the user picks from the menu.",
+      "files": [],
+      "expectations": [
+        "Sends a single intake message rather than multiple rounds or a long analysis",
+        "Asks at most 6 questions",
+        "Says explicitly that the questions are skippable",
+        "Does not re-ask the company, role, or current job the user already gave",
+        "Explains the LinkedIn / Claude in Chrome setup in plain language (or states that browser access is unavailable and what that means)",
+        "Includes the heads-up that LinkedIn may show people you viewed their profile",
+        "Does not deliver research findings, ratings, or a recommendation yet"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "eval-2-direct-call-prep",
+      "prompt": "tomorrow 10am I have my second call with the VP of Product at Veridia Health, who'd be my manager. first call was mostly them pitching the role. what should I actually ask this time? I care most about whether there's a real path to Head of Product",
+      "expected_output": "Goes straight to a one-page Call Sheet with no full intake: walk-away goals; 3-5 prioritized questions focused on path to next level and the manager; a listen-for (real answer vs. non-answer) for each question; timing notes; closes by inviting a debrief after the call.",
+      "files": [],
+      "expectations": [
+        "Goes straight to call prep without a full intake questionnaire",
+        "Provides 3-5 prioritized questions (not a long undifferentiated list)",
+        "Gives a listen-for (what a real answer vs. a non-answer sounds like) for every question",
+        "Prioritizes the path to Head of Product and the manager relationship",
+        "Includes at least one timing note (what to ask now vs. later)",
+        "Invites the user to debrief / paste notes after the call",
+        "The core call sheet fits on roughly one page (under ~700 words)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "eval-3-debrief-recruiter-notes",
+      "prompt": "ok just got off the phone with the Veridia recruiter. notes: role is a backfill, last director left after ~8 months. band is 230-260 base, they'd come in around 245. the VP Product (hiring manager) joined 4 months ago from a big tech co. they want an answer by next friday. i also have a final round at Quillstone next week. thoughts?",
+      "expected_output": "Debrief behavior: extracts the new facts with labels (the recruiter's statements are Reported); flags the short-tenure predecessor and the brand-new manager as risks to probe, not verdicts; rates with High / Medium / Low / ? only (no numeric scores); suggests asking for more time and aligning timelines with Quillstone, using the scripts; recommends one next step.",
+      "files": [],
+      "expectations": [
+        "Marks the recruiter's statements with confidence labels (e.g., Reported) or equivalent",
+        "Frames the ~8-month predecessor tenure as a risk to probe with a question, not a verdict",
+        "Frames the 4-month hiring manager tenure as a risk to probe with a question",
+        "Uses only High / Medium / Low / ? style ratings, never numeric scores",
+        "Suggests asking Veridia for more time / aligning timelines with Quillstone, with suggested wording",
+        "Checks the ~245 offer against the 230-260 band",
+        "Recommends one specific next step"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "eval-4-synthesis-pmm-research-pack",
+      "prompt": "I've pasted my notes on two PMM leadership options plus staying at my current job (see the attached file). Don't do any more research, just work from these notes. Quillstone's offer expires Friday. Help me decide, and give me the full picture, not just a scorecard.",
+      "expected_output": "A decision brief with v0-level nuance: avoids the planted data traps (contractor-inflated headcount and tenure, a Head-of title that is Director-level, a +200% growth rate on a base of 1, an unverified rumor, a crowd-sourced org chart conflicting with the recruiter); checks both deal-breakers; High/Medium/Low/? ratings; an honest reframe; option-by-option reasoning; money caveats turned into questions; tailored coaching for the key conversations (including asking Quillstone for more time); a dated plan.",
+      "files": [
+        "evals/files/research-pack-pmm.md"
+      ],
+      "expectations": [
+        "Uses Kestrel's company-stated ~700 employees, not the 2,540 LinkedIn associated-member count",
+        "Does not treat Kestrel's 1.1-year LinkedIn median tenure as meaningful (or explains why it's contaminated)",
+        "Notes that Quillstone's 'Head of Product Marketing' title is Director-level internally",
+        "Flags the former acting Head of PMM on the Quillstone team as an internal-candidate risk",
+        "Identifies the cluster of marketing departures after the new CMO arrived as a pattern to probe",
+        "Treats the Kestrel VP's possible move to GM as unverified and turns it into a question",
+        "Handles the TheOrg vs. recruiter reporting-line conflict (prefers the recruiter or flags TheOrg as directional)",
+        "Does not cite '+200% PMM openings' without its base (1 to 3)",
+        "Checks both deal-breakers (office days <= 3 and base >= $230K) for every option",
+        "Uses only High / Medium / Low / ? style ratings, never numeric scores",
+        "Includes an explicit reframe of the decision beyond comparing titles",
+        "Advises asking Quillstone for more time before Friday, with suggested wording",
+        "Suggests the previous Quillstone Head of PMM (now VP elsewhere) as a backchannel",
+        "Turns equity / valuation uncertainty into questions (e.g., 409A, tender plans) without valuing the equity",
+        "Includes a dated or sequenced plan for the coming days",
+        "Produces the visual cover (HTML) in addition to the written analysis"
+      ]
+    }
+  ]
+}
