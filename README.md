@@ -4,7 +4,7 @@
 
 At a senior level you don't join a job description. You join a manager, the leaders above them, a career ladder, a team, and an org that is either growing or quietly losing its people. Companies run references and backchannels on you. This skill helps you do the same to them.
 
-It's an agent skill for **Claude** and **Codex**, built for senior PMs, PMMs, and product leaders who are late in a process or holding an offer. It works as a **researcher, strategist, and coach in one**, and it's read-only throughout.
+It's an agent skill for **Claude** and **Codex**, built for mid to senior professionals who are late in a process or holding an offer. It works as a **researcher, strategist, and coach in one**, and it's read-only throughout.
 
 ![How a run works: what went in, the three hats, what you got, and how sure each claim is](docs/images/how-it-works.png)
 
